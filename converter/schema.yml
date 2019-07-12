@@ -1,0 +1,70 @@
+# variables
+searchable: &searchable
+  indexed: true
+  stored: true
+  multiValued: false
+string: &string
+  type: string
+  <<: *searchable
+  omitNorms: true
+integer: &integer
+  type: pint
+  <<: *searchable
+  omitNorms: true
+english: &english
+  type: text_en
+  <<: *searchable
+  omitNorms: false
+
+# types
+types: 
+  - name: location_rpt
+    class: solr.SpatialRecursivePrefixTreeFieldType
+    spatialContextFactory: JTS
+    autoIndex: true
+    validationRule: repairBuffer0
+    geo: true
+    format: WKT
+    distErrPct: 0.025
+    maxDistErr: 0.001
+    distanceUnits: kilometers
+
+# fields
+fields: 
+  - name: WKT
+    type: location_rpt
+    indexed: true
+    stored: true
+    multiValued: false
+    omitNorms: false
+  - name: objectid
+    <<: *integer
+  - name: scalerank
+    <<: *integer
+  - name: featurecla
+    <<: *string
+  - name: name
+    <<: *string
+  - name: map_color6
+    <<: *integer
+  - name: map_color8
+    <<: *integer
+  - name: note
+    <<: *english
+  - name: zone
+    <<: *string
+  - name: utc_format
+    <<: *string
+  - name: time_zone
+    <<: *string
+  - name: iso_8601
+    <<: *string
+  - name: places
+    <<: *english
+  - name: dst_places
+    <<: *english
+  - name: tz_name1st
+    <<: *string
+  - name: tz_namesum
+    <<: *integer
+
