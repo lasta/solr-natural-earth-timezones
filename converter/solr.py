@@ -99,6 +99,9 @@ class SolrClient:
         url = self.__build_url(suffix="update/json/docs")
         headers = {"Content-type": "application/json"}
         req = Request(url, json.dumps(document).encode(), headers, method="POST")
+        # TODO: rearrange point outer of ((-90, -180), (90, 180)) to on border.
+        # s/( -?)9\d\.\d{2,}/\190.0/g
+        # s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
         try:
             with urlopen(req) as res:
                 _ = res.read()
@@ -108,6 +111,7 @@ class SolrClient:
             if err.code == 400:
                 print(f"[ERROR]: Skipped to index {document['places']}")
                 print(err.msg)
+                print(json.dumps(document).encode())
                 return
             raise err
         except URLError as err:
