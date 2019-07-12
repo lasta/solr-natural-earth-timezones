@@ -49,4 +49,4 @@ def index(c, data, core, server=DEFAULT_SOLR_URL):
         csv.field_size_limit(sys.maxsize)
         reader = csv.DictReader(csvfile, delimiter='\t')
         client.index(documents=reader)
-    client.commit(core=core, server=server)
+    client.commit()

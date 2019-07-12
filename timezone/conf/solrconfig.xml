@@ -770,6 +770,24 @@
     </lst>
   </requestHandler>
 
+  <requestHandler name="/geocode" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="echoParams">explicit</str>
+      <str name="q">*:*</str>
+      <str name="fl">
+        time_zone,
+        iso_8601,
+        places,
+        tz_name1st
+      </str>
+      <bool name="spatial">true</bool>
+      <str name="fq">{!geofilt}</str>
+      <int name="d">0</int>
+      <str name="sfield">WKT</str>
+      <str name="wt">json</str>
+      <str name="indent">true</str>
+    </lst>
+  </requestHandler>
 
   <!-- A Robust Example
 

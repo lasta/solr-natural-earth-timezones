@@ -2,7 +2,7 @@
 <!-- Solr managed schema - automatically generated - DO NOT EDIT -->
 <schema name="default-config" version="1.6">
   <uniqueKey>id</uniqueKey>
-  <fieldType name="_nest_path_" class="solr.NestPathField" omitTermFreqAndPositions="true" omitNorms="true" maxCharsForDocValues="-1" stored="false"/>
+  <fieldType name="_nest_path_" class="solr.NestPathField" maxCharsForDocValues="-1" omitNorms="true" omitTermFreqAndPositions="true" stored="false"/>
   <fieldType name="ancestor_path" class="solr.TextField">
     <analyzer type="index">
       <tokenizer class="solr.KeywordTokenizerFactory"/>
@@ -444,18 +444,23 @@
   <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
   <field name="_version_" type="plong" indexed="false" stored="false"/>
   <field name="dst_places" type="text_en" omitNorms="false" multiValued="false" indexed="true" stored="true"/>
+  <field name="featrecla" type="text_general"/>
   <field name="featurecla" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="iso_8601" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="iso_861" type="text_general"/>
   <field name="map_color6" type="pint" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="map_color8" type="pint" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="name" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="note" type="text_en" omitNorms="false" multiValued="false" indexed="true" stored="true"/>
   <field name="objectid" type="pint" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="ojectid" type="plongs"/>
   <field name="places" type="text_en" omitNorms="false" multiValued="false" indexed="true" stored="true"/>
   <field name="scalerank" type="pint" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="tc_format" type="text_general"/>
   <field name="time_zone" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="tz_name1st" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
+  <field name="tz_namesm" type="plongs"/>
   <field name="tz_namesum" type="pint" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="utc_format" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
   <field name="zone" type="string" omitNorms="true" multiValued="false" indexed="true" stored="true"/>
@@ -527,4 +532,7 @@
   <dynamicField name="*_f" type="pfloat" indexed="true" stored="true"/>
   <dynamicField name="*_d" type="pdouble" indexed="true" stored="true"/>
   <dynamicField name="*_p" type="location" indexed="true" stored="true"/>
+  <copyField source="tc_format" dest="tc_format_str" maxChars="256"/>
+  <copyField source="iso_861" dest="iso_861_str" maxChars="256"/>
+  <copyField source="featrecla" dest="featrecla_str" maxChars="256"/>
 </schema>

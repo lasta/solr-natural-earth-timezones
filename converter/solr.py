@@ -106,7 +106,8 @@ class SolrClient:
             print(err.code)
             print(err.reason)
             if err.code == 400:
-                print(f"[ERROR]: Skipped to index {document['ADMIN']}")
+                print(f"[ERROR]: Skipped to index {document['places']}")
+                print(err.msg)
                 return
             raise err
         except URLError as err:

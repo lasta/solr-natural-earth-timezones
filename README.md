@@ -14,4 +14,3 @@ Timezones
   * `SEPARATOR`: TAB
   * `WRITE_BOM`: `NO`
 
-
