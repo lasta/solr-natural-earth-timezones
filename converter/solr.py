@@ -7,9 +7,9 @@ from typing import Dict, Iterator, List
 
 DEFAULT_SOLR_URL = 'http://localhost:8983/solr'
 # s/( -?)9\d\.\d{2,}/\190.0/g
+REGEX_OUTER_LATITUDE = re.compile(r"(?P<sign> -?)9\d\.\d{2,}")
 # s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
-REGEX_OUTER_LATITUDE = re.compile(r"( -?)9\d\.\d{2,}")
-REGEX_OUTER_LONGITUDE = re.compile(r"([\(,]-?)18\d\.\d{2,}")
+REGEX_OUTER_LONGITUDE = re.compile(r"(?P<sign>[\(,]-?)18\d\.\d{2,}")
 
 
 class SolrClient:
@@ -102,14 +102,7 @@ class SolrClient:
         return [self.__index_document(document) for document in documents]
 
     def __index_document(self, document: Dict):
-        # TODO: extract to another function
-        # rearrange point outer of ((-90, -180), (90, 180)) to on border.
-        # latitude: s/( -?)9\d\.\d{2,}/\190.0/g
-        # longitude: s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
-        wkt = document["WKT"]
-        wkt = re.sub(REGEX_OUTER_LATITUDE, r"\g<1>90.0", wkt)
-        wkt = re.sub(REGEX_OUTER_LONGITUDE, r"\g<1>180.0", wkt)
-        document["WKT"] = wkt
+        document["WKT"] = rearrange_out_of_range_point(document["WKT"])
 
         url = self.__build_url(suffix="update/json/docs")
         headers = {"Content-type": "application/json"}
@@ -129,6 +122,7 @@ class SolrClient:
         except URLError as err:
             print(err.reason)
             raise err
+    
 
     def commit(self):
         url = self.__build_url(suffix="update?commit=true")
@@ -155,3 +149,16 @@ class SolrClient:
         except URLError as err:
             print(err.reason)
             raise err
+
+
+def rearrange_out_of_range_point(wkt: str) -> str:
+    r"""
+    Flatten out of range point to on border.
+    latitude: [-90.0, 90.0]; longitude: [-180.0, 180.0]
+
+    latitude: 's/( -?)9\d\.\d{2,}/\190.0/g'
+    longitude: 's/([\(,]-?)18\d\.\d{2,}/\1180.0/g'
+    """
+    wkt = REGEX_OUTER_LATITUDE.sub(r"\g<sign>90.0", wkt)
+    wkt = REGEX_OUTER_LONGITUDE.sub(r"\g<sign>180.0", wkt)
+    return wkt
