@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 import json
+import re
 # TODO: Replase urllib to requests
 from urllib.request import Request, urlopen, HTTPError, URLError
 from typing import Dict, Iterator, List
 
 DEFAULT_SOLR_URL = 'http://localhost:8983/solr'
+# s/( -?)9\d\.\d{2,}/\190.0/g
+# s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
+REGEX_OUTER_LATITUDE = re.compile(r"( -?)9\d\.\d{2,}")
+REGEX_OUTER_LONGITUDE = re.compile(r"([\(,]-?)18\d\.\d{2,}")
+
 
 class SolrClient:
     def __init__(self, core: str, base_url: str = DEFAULT_SOLR_URL):
@@ -96,12 +102,18 @@ class SolrClient:
         return [self.__index_document(document) for document in documents]
 
     def __index_document(self, document: Dict):
+        # TODO: extract to another function
+        # rearrange point outer of ((-90, -180), (90, 180)) to on border.
+        # latitude: s/( -?)9\d\.\d{2,}/\190.0/g
+        # longitude: s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
+        wkt = document["WKT"]
+        wkt = re.sub(REGEX_OUTER_LATITUDE, r"\g<1>90.0", wkt)
+        wkt = re.sub(REGEX_OUTER_LONGITUDE, r"\g<1>180.0", wkt)
+        document["WKT"] = wkt
+
         url = self.__build_url(suffix="update/json/docs")
         headers = {"Content-type": "application/json"}
         req = Request(url, json.dumps(document).encode(), headers, method="POST")
-        # TODO: rearrange point outer of ((-90, -180), (90, 180)) to on border.
-        # s/( -?)9\d\.\d{2,}/\190.0/g
-        # s/([\(,]-?)18\d\.\d{2,}/\1180.0/g
         try:
             with urlopen(req) as res:
                 _ = res.read()
